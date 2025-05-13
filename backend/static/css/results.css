@@ -1,0 +1,768 @@
+/* Results Page Styles */
+:root {
+    --bg-color: #f7fafc;
+    --text-color: #2d3748;
+    --card-bg: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --primary-color: #3182ce;
+    --secondary-color: #4299e1;
+    --accent-color: #ebf8ff;
+    --border-color: #e2e8f0;
+    --success-color: #48bb78;
+    --error-color: #f56565;
+    --warning-color: #ed8936;
+    --info-color: #4299e1;
+    --low-risk: #48bb78;
+    --medium-risk: #ed8936;
+    --high-risk: #f56565;
+}
+
+.dark-mode {
+    --bg-color: #1a202c;
+    --text-color: #e2e8f0;
+    --card-bg: #2d3748;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --primary-color: #63b3ed;
+    --secondary-color: #90cdf4;
+    --accent-color: #2a4365;
+    --border-color: #4a5568;
+    --success-color: #68d391;
+    --error-color: #fc8181;
+    --warning-color: #f6ad55;
+    --info-color: #90cdf4;
+    --low-risk: #68d391;
+    --medium-risk: #f6ad55;
+    --high-risk: #fc8181;
+}
+
+.results-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 150px);
+    /* Account for header and footer */
+    padding: 2rem;
+    background-color: var(--bg-color);
+}
+
+.results-card {
+    width: 100%;
+    max-width: 1000px;
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px var(--shadow-color);
+    transition: box-shadow 0.3s ease;
+}
+
+.results-card:hover {
+    box-shadow: 0 20px 40px var(--shadow-color);
+}
+
+/* Header */
+.results-header {
+    text-align: center;
+    padding: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+}
+
+.results-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.results-header .timestamp {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Content */
+.results-content {
+    padding: 2rem;
+}
+
+/* Results Overview */
+.results-overview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.image-container {
+    flex: 1;
+    min-width: 250px;
+}
+
+.image-wrapper {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.result-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-wrapper:hover .image-overlay {
+    opacity: 1;
+}
+
+.zoom-btn {
+    background-color: rgba(255, 255, 255, 0.8);
+    color: var(--text-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.zoom-btn:hover {
+    transform: scale(1.1);
+}
+
+.image-caption {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.diagnosis-summary {
+    flex: 2;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Diagnosis Result */
+.diagnosis-result {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 10px;
+    animation: fadeIn 0.5s ease;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.diagnosis-result.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.diagnosis-result.cancerous {
+    background-color: rgba(245, 101, 101, 0.1);
+    border-left: 4px solid var(--error-color);
+}
+
+.diagnosis-result.non-cancerous,
+.diagnosis-result.benign {
+    background-color: rgba(72, 187, 120, 0.1);
+    border-left: 4px solid var(--success-color);
+}
+
+.result-icon {
+    font-size: 2.5rem;
+}
+
+.diagnosis-result.cancerous .result-icon {
+    color: var(--error-color);
+}
+
+.diagnosis-result.non-cancerous .result-icon,
+.diagnosis-result.benign .result-icon {
+    color: var(--success-color);
+}
+
+.result-text h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.diagnosis-result.cancerous .result-text h2 {
+    color: var(--error-color);
+}
+
+.diagnosis-result.non-cancerous .result-text h2,
+.diagnosis-result.benign .result-text h2 {
+    color: var(--success-color);
+}
+
+.result-text p {
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+/* Confidence Meter */
+.confidence-meter {
+    animation: fadeIn 0.5s ease 0.2s forwards;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.confidence-meter.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.meter-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.confidence-value {
+    font-size: 1.1rem;
+}
+
+.meter-bar {
+    height: 10px;
+    background-color: var(--border-color);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.meter-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 1s ease-in-out;
+
+}
+
+.meter-fill.cancerous {
+    background: linear-gradient(90deg, var(--warning-color), var(--error-color));
+}
+
+.meter-fill.non-cancerous,
+.meter-fill.benign {
+    background: linear-gradient(90deg, var(--info-color), var(--success-color));
+}
+
+/* Risk Indicator */
+.risk-indicator {
+    animation: fadeIn 0.5s ease 0.4s forwards;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.risk-indicator.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.risk-label {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-color);
+}
+
+.risk-levels {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.risk-level {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding-top: 1.5rem;
+}
+
+.level-marker {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+}
+
+.risk-level[data-level="Low"] .level-marker {
+    background-color: var(--low-risk);
+}
+
+.risk-level[data-level="Medium"] .level-marker {
+    background-color: var(--medium-risk);
+}
+
+.risk-level[data-level="High"] .level-marker {
+    background-color: var(--high-risk);
+}
+
+.risk-level span {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.risk-level.active span {
+    font-weight: 600;
+    opacity: 1;
+}
+
+.risk-level[data-level="Low"].active span {
+    color: var(--low-risk);
+}
+
+.risk-level[data-level="Medium"].active span {
+    color: var(--medium-risk);
+}
+
+.risk-level[data-level="High"].active span {
+    color: var(--high-risk);
+}
+
+/* Recommendation Section */
+.recommendation-section {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    animation: fadeIn 0.5s ease 0.6s forwards;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.recommendation-section.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.recommendation-section.cancerous {
+    background-color: rgba(245, 101, 101, 0.1);
+}
+
+.recommendation-section.non-cancerous,
+.recommendation-section.benign {
+    background-color: rgba(72, 187, 120, 0.1);
+}
+
+.recommendation-icon {
+    font-size: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+}
+
+.recommendation-section.cancerous .recommendation-icon {
+    color: var(--error-color);
+}
+
+.recommendation-section.non-cancerous .recommendation-icon,
+.recommendation-section.benign .recommendation-icon {
+    color: var(--success-color);
+}
+
+.recommendation-content {
+    flex: 1;
+}
+
+.recommendation-content h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-color);
+}
+
+.recommendation-content p {
+    margin-bottom: 1.25rem;
+    color: var(--text-color);
+}
+
+.action-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.action-step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.step-number {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.step-text {
+    color: var(--text-color);
+}
+
+/* Additional Info */
+.additional-info {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.info-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    font-weight: 600;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: relative;
+}
+
+.tab-btn:not(:last-child) {
+    border-right: 1px solid var(--border-color);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    background-color: rgba(49, 130, 206, 0.05);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--primary-color);
+}
+
+.tab-content {
+    padding: 1.5rem;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-pane h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+/* Characteristics List */
+.characteristics-list {
+    list-style: none;
+    padding: 0;
+}
+
+.characteristics-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.characteristics-list li:last-child {
+    border-bottom: none;
+}
+
+.characteristic-name {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.characteristic-value {
+    color: var(--primary-color);
+}
+
+/* Resources List */
+.resources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.resource-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: var(--accent-color);
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.resource-link:hover {
+    transform: translateY(-3px);
+}
+
+.resource-link i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.resource-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.resource-title {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.resource-desc {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+/* Next Steps */
+.next-steps-content p {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.steps-list {
+    padding-left: 1.5rem;
+}
+
+.steps-list li {
+    margin-bottom: 0.75rem;
+    color: var(--text-color);
+}
+
+/* Footer */
+.results-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.disclaimer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background-color: rgba(66, 153, 225, 0.1);
+}
+
+.disclaimer i {
+    color: var(--info-color);
+    font-size: 1.2rem;
+}
+
+.disclaimer p {
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.secondary-btn {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+/* Image Modal */
+.image-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.close-modal {
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.close-modal:hover {
+    transform: scale(1.2);
+}
+
+#modal-image {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .results-overview {
+        flex-direction: column;
+    }
+
+    .recommendation-section {
+        flex-direction: column;
+    }
+
+    .recommendation-icon {
+        width: auto;
+        margin-bottom: 1rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .info-tabs {
+        flex-direction: column;
+    }
+
+    .tab-btn:not(:last-child) {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .close-modal {
+        top: -30px;
+        right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .results-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .results-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .diagnosis-result {
+        padding: 1rem;
+    }
+
+    .result-icon {
+        font-size: 2rem;
+    }
+
+    .result-text h2 {
+        font-size: 1.5rem;
+    }
+}

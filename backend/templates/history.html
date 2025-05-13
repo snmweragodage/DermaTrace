@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis History | DermaTRACE{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="history-page-container">
+    <div class="history-header">
+        <div class="header-content">
+            <h1><i class="fas fa-history"></i> Analysis History</h1>
+            <p class="subtitle">Track and monitor your skin health over time</p>
+        </div>
+    </div>
+
+    <div class="history-controls">
+        <div class="search-filter">
+            <div class="filter-options">
+                <select id="filter-results" class="filter-select">
+                    <option value="all">All Results</option>
+                    <option value="cancerous">Cancerous</option>
+                    <option value="non-cancerous">Non-Cancerous</option>
+                </select>
+                <select id="sort-by" class="filter-select">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="highest-risk">Highest Risk</option>
+                    <option value="lowest-risk">Lowest Risk</option>
+                </select>
+            </div>
+        </div>
+
+        {% if results %}
+        <div class="history-stats">
+            <div class="stat-item">
+                <div class="stat-value">{{ results|length }}</div>
+                <div class="stat-label">Total Scans</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ results|selectattr('result', 'equalto', 'Cancerous')|list|length }}</div>
+                <div class="stat-label">Concerning</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ results|selectattr('result', 'equalto', 'Non-Cancerous')|list|length }}</div>
+                <div class="stat-label">Normal</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ results[-1].upload_time.strftime('%b %d') if results else 'N/A' }}</div>
+                <div class="stat-label">Last Scan</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if results %}
+    <div class="history-timeline">
+        <div class="timeline-header">
+            <div class="timeline-col image-col">Image</div>
+            <div class="timeline-col result-col">Result</div>
+            <div class="timeline-col type-col">Type</div>
+            <div class="timeline-col risk-col">Risk Level</div>
+            <div class="timeline-col date-col">Date</div>
+            <div class="timeline-col actions-col">Actions</div>
+        </div>
+
+        <div class="timeline-entries" id="history-entries">
+            {% for r in results %}
+            <div class="timeline-entry" data-result="{{ r.result|lower }}" data-risk="{{ r.risk|lower }}"
+                data-date="{{ r.upload_time.strftime('%Y-%m-%d') }}" data-type="{{ r.cancer_type }}">
+                <div class="timeline-col image-col">
+                    <div class="entry-image">
+                        <img src="{{ url_for('static', filename='uploads/' + r.filename) }}" alt="Skin Lesion Image">
+                        <div class="image-overlay">
+                            <button class="view-btn"
+                                data-image="{{ url_for('static', filename='uploads/' + r.filename) }}">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-col result-col">
+                    <div class="result-badge {{ r.result|lower }}">
+                        {% if r.result == 'Cancerous' %}
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {% else %}
+                        <i class="fas fa-check-circle"></i>
+                        {% endif %}
+                        {{ r.result }}
+                    </div>
+                </div>
+
+                <div class="timeline-col type-col">
+                    <span class="type-label">{{ r.cancer_type }}</span>
+                </div>
+
+                <div class="timeline-col risk-col">
+                    <div class="risk-indicator">
+                        <div class="risk-bar">
+                            <div class="risk-fill {{ r.risk|lower }}"
+                                style="width: {{ r.percentage|replace('%', '') }}%"></div>
+                        </div>
+                        <div class="risk-text">
+                            <span class="risk-level {{ r.risk|lower }}">{{ r.risk }}</span>
+                            <span class="risk-percentage">{{ r.percentage }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-col date-col">
+                    <div class="date-info">
+                        <div class="date-day">{{ r.upload_time.strftime('%b %d, %Y') }}</div>
+                        <div class="date-time">{{ r.upload_time.strftime('%H:%M') }}</div>
+                    </div>
+                </div>
+
+                <div class="timeline-col actions-col">
+                    <div class="entry-actions">
+                        <a href="/results/{{ r.id }}" class="action-btn view-details" title="View Details">
+                            <i class="fas fa-file-medical"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="history-pagination">
+        <button class="pagination-btn" id="prev-page" disabled>
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        <div class="page-indicator">
+            Page <span id="current-page">1</span> of <span id="total-pages">1</span>
+        </div>
+        <button class="pagination-btn" id="next-page" disabled>
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-history"></i>
+        </div>
+        <h2>No Analysis History Found</h2>
+        <p>You haven't analyzed any skin images yet. Upload an image to get started.</p>
+        <a href="/upload" class="primary-btn">
+            <i class="fas fa-upload"></i> Upload an Image
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="history-footer">
+        <div class="footer-actions">
+            <a href="/home" class="secondary-btn">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+            <a href="/upload" class="primary-btn">
+                <i class="fas fa-upload"></i> New Analysis
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="image-modal" id="image-modal">
+    <div class="modal-content">
+        <span class="close-modal" id="close-modal">&times;</span>
+        <img src="/placeholder.svg" alt="Enlarged Skin Lesion" id="modal-image">
+        <div class="modal-caption" id="modal-caption"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Variables
+        const entriesPerPage = 10;
+        let currentPage = 1;
+        let filteredEntries = [];
+
+        // Elements
+        const filterSelect = document.getElementById('filter-results');
+        const sortSelect = document.getElementById('sort-by');
+        const entriesContainer = document.getElementById('history-entries');
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const currentPageSpan = document.getElementById('current-page');
+        const totalPagesSpan = document.getElementById('total-pages');
+        const modal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+        const modalCaption = document.getElementById('modal-caption');
+        const closeModal = document.getElementById('close-modal');
+
+        // Initialize
+        if (entriesContainer) {
+            const allEntries = Array.from(entriesContainer.querySelectorAll('.timeline-entry'));
+            filteredEntries = [...allEntries];
+            updatePagination();
+            displayEntries();
+
+            // Filter functionality
+            filterSelect.addEventListener('change', filterEntries);
+            sortSelect.addEventListener('change', sortEntries);
+
+            // Pagination
+            prevPageBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayEntries();
+                    updatePagination();
+                }
+            });
+
+            nextPageBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredEntries.length / entriesPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayEntries();
+                    updatePagination();
+                }
+            });
+
+            // Image modal
+            const viewButtons = document.querySelectorAll('.view-btn');
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const imageSrc = this.getAttribute('data-image');
+                    modalImage.src = imageSrc;
+                    modalCaption.textContent = 'Analyzed on ' + this.closest('.timeline-entry').getAttribute('data-date');
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            closeModal.addEventListener('click', closeImageModal);
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) {
+                    closeImageModal();
+                }
+            });
+        }
+
+        // Functions
+        function filterEntries() {
+            const filterValue = filterSelect.value;
+
+            const allEntries = Array.from(entriesContainer.querySelectorAll('.timeline-entry'));
+
+            filteredEntries = allEntries.filter(entry => {
+                const result = entry.getAttribute('data-result');
+                return filterValue === 'all' || result === filterValue;
+            });
+
+            currentPage = 1;
+            sortEntries();
+            updatePagination();
+            displayEntries();
+        }
+
+        function sortEntries() {
+            const sortValue = sortSelect.value;
+
+            filteredEntries.sort((a, b) => {
+                const dateA = new Date(a.getAttribute('data-date'));
+                const dateB = new Date(b.getAttribute('data-date'));
+                const riskA = parseFloat(a.querySelector('.risk-percentage').textContent);
+                const riskB = parseFloat(b.querySelector('.risk-percentage').textContent);
+
+                switch (sortValue) {
+                    case 'newest':
+                        return dateB - dateA;
+                    case 'oldest':
+                        return dateA - dateB;
+                    case 'highest-risk':
+                        return riskB - riskA;
+                    case 'lowest-risk':
+                        return riskA - riskB;
+                    default:
+                        return dateB - dateA;
+                }
+            });
+
+            displayEntries();
+        }
+
+        function displayEntries() {
+            const startIndex = (currentPage - 1) * entriesPerPage;
+            const endIndex = startIndex + entriesPerPage;
+            const entriesToShow = filteredEntries.slice(startIndex, endIndex);
+
+            // Hide all entries
+            filteredEntries.forEach(entry => {
+                entry.style.display = 'none';
+            });
+
+            // Show only the entries for the current page
+            entriesToShow.forEach(entry => {
+                entry.style.display = 'flex';
+            });
+
+            // Show message if no entries match the filter
+            if (filteredEntries.length === 0) {
+                const noResultsMsg = document.createElement('div');
+                noResultsMsg.className = 'no-results-message';
+                noResultsMsg.innerHTML = '<i class="fas fa-search"></i><p>No results match your filter criteria.</p>';
+                entriesContainer.innerHTML = '';
+                entriesContainer.appendChild(noResultsMsg);
+            } else if (entriesContainer.querySelector('.no-results-message')) {
+                entriesContainer.querySelector('.no-results-message').remove();
+                filteredEntries.forEach(entry => {
+                    entriesContainer.appendChild(entry);
+                });
+            }
+        }
+
+        function updatePagination() {
+            const totalPages = Math.max(1, Math.ceil(filteredEntries.length / entriesPerPage));
+            currentPageSpan.textContent = currentPage;
+            totalPagesSpan.textContent = totalPages;
+
+            prevPageBtn.disabled = currentPage <= 1;
+            nextPageBtn.disabled = currentPage >= totalPages;
+        }
+
+        function closeImageModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
+</script>
+{% endblock %}

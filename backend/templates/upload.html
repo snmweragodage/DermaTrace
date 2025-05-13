@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+
+{% block title %}Upload | DermaTRACE{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="upload-page-container">
+    <div class="upload-card">
+        <div class="upload-header">
+            <h1>Check a Skin Lesion</h1>
+            <p>Upload a clear image of your skin lesion for AI-powered analysis</p>
+        </div>
+
+        <div class="upload-content">
+            <div class="upload-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <div class="step-text">Upload</div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="2">
+                    <div class="step-icon">
+                        <i class="fas fa-crop-alt"></i>
+                    </div>
+                    <div class="step-text">Adjust</div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="3">
+                    <div class="step-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="step-text">Analyze</div>
+                </div>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" id="upload-form" class="upload-form">
+                <!-- Step 1: Upload -->
+                <div class="upload-step active" id="step-upload">
+                    <div class="upload-area" id="upload-area">
+                        <input type="file" name="file" id="file-input" accept="image/*" required hidden>
+                        <div class="upload-placeholder" id="upload-placeholder">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Drag & Drop your image here</h3>
+                            <p>or</p>
+                            <button type="button" class="browse-btn" id="browse-btn">Browse Files</button>
+                            <p class="upload-hint">Accepted formats: JPG, PNG, HEIC (max 10MB)</p>
+                        </div>
+                        <div class="upload-preview" id="upload-preview" style="display: none;">
+                            <img src="/placeholder.svg" alt="Preview" id="preview-image">
+                            <div class="preview-actions">
+                                <button type="button" class="action-btn remove-btn" id="remove-btn">
+                                    <i class="fas fa-trash"></i>
+                                    <span>Remove</span>
+                                </button>
+                                <button type="button" class="action-btn continue-btn" id="continue-btn">
+                                    <span>Continue</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="upload-tips">
+                        <h3><i class="fas fa-lightbulb"></i> Tips for best results</h3>
+                        <ul>
+                            <li>Ensure good lighting with no shadows</li>
+                            <li>Keep the lesion centered in the frame</li>
+                            <li>Take the photo from directly above the lesion</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 2: Adjust -->
+                <div class="upload-step" id="step-adjust" style="display: none;">
+                    <div class="adjust-container">
+                        <div class="adjust-area" id="adjust-area">
+                            <div class="adjust-image-container" id="adjust-image-container">
+                                <!-- Image will be inserted here by JavaScript -->
+                            </div>
+                            <div class="adjust-controls">
+                                <div class="control-group">
+                                    <label>Zoom</label>
+                                    <div class="slider-container">
+                                        <button type="button" class="slider-btn" id="zoom-out-btn">
+                                            <i class="fas fa-search-minus"></i>
+                                        </button>
+                                        <input type="range" min="100" max="200" value="100" class="slider"
+                                            id="zoom-slider">
+                                        <button type="button" class="slider-btn" id="zoom-in-btn">
+                                            <i class="fas fa-search-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Brightness</label>
+                                    <div class="slider-container">
+                                        <button type="button" class="slider-btn" id="brightness-down-btn">
+                                            <i class="fas fa-sun"></i>
+                                        </button>
+                                        <input type="range" min="50" max="150" value="100" class="slider"
+                                            id="brightness-slider">
+                                        <button type="button" class="slider-btn" id="brightness-up-btn">
+                                            <i class="fas fa-sun"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Contrast</label>
+                                    <div class="slider-container">
+                                        <button type="button" class="slider-btn" id="contrast-down-btn">
+                                            <i class="fas fa-adjust"></i>
+                                        </button>
+                                        <input type="range" min="50" max="150" value="100" class="slider"
+                                            id="contrast-slider">
+                                        <button type="button" class="slider-btn" id="contrast-up-btn">
+                                            <i class="fas fa-adjust"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="adjust-actions">
+                            <button type="button" class="secondary-btn" id="back-to-upload-btn">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Back</span>
+                            </button>
+                            <button type="button" class="primary-btn" id="proceed-to-analyze-btn">
+                                <span>Proceed to Analysis</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Analyze -->
+                <div class="upload-step" id="step-analyze" style="display: none;">
+                    <div class="analyze-container">
+                        <div class="analyze-status">
+                            <div class="status-icon">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                            <h3>Analyzing your image...</h3>
+                            <p>Our AI is examining the skin lesion. This may take a few moments.</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="analyze-progress"></div>
+                            </div>
+                            <div class="status-steps">
+                                <div class="status-step completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Image uploaded</span>
+                                </div>
+                                <div class="status-step active">
+                                    <i class="fas fa-sync fa-spin"></i>
+                                    <span>Processing image</span>
+                                </div>
+                                <div class="status-step">
+                                    <i class="fas fa-circle"></i>
+                                    <span>Generating results</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden fields for adjusted image data -->
+                <input type="hidden" name="adjusted_image" id="adjusted-image-data">
+                <input type="hidden" name="zoom_level" id="zoom-level" value="100">
+                <input type="hidden" name="brightness_level" id="brightness-level" value="100">
+                <input type="hidden" name="contrast_level" id="contrast-level" value="100">
+            </form>
+        </div>
+
+        <div class="upload-footer">
+            <a href="/home" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Home</span>
+            </a>
+            <div class="privacy-note">
+                <i class="fas fa-shield-alt"></i>
+                <span>Your images are processed securely and privately</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Elements
+        const uploadForm = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file-input');
+        const uploadArea = document.getElementById('upload-area');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const uploadPreview = document.getElementById('upload-preview');
+        const previewImage = document.getElementById('preview-image');
+        const browseBtn = document.getElementById('browse-btn');
+        const removeBtn = document.getElementById('remove-btn');
+        const continueBtn = document.getElementById('continue-btn');
+
+        // Step navigation elements
+        const steps = document.querySelectorAll('.step');
+        const uploadStep = document.getElementById('step-upload');
+        const adjustStep = document.getElementById('step-adjust');
+        const analyzeStep = document.getElementById('step-analyze');
+        const backToUploadBtn = document.getElementById('back-to-upload-btn');
+        const proceedToAnalyzeBtn = document.getElementById('proceed-to-analyze-btn');
+
+        // Adjustment elements
+        const adjustImageContainer = document.getElementById('adjust-image-container');
+        const zoomSlider = document.getElementById('zoom-slider');
+        const zoomInBtn = document.getElementById('zoom-in-btn');
+        const zoomOutBtn = document.getElementById('zoom-out-btn');
+        const brightnessSlider = document.getElementById('brightness-slider');
+        const brightnessUpBtn = document.getElementById('brightness-up-btn');
+        const brightnessDownBtn = document.getElementById('brightness-down-btn');
+        const contrastSlider = document.getElementById('contrast-slider');
+        const contrastUpBtn = document.getElementById('contrast-up-btn');
+        const contrastDownBtn = document.getElementById('contrast-down-btn');
+
+        // Hidden fields
+        const adjustedImageData = document.getElementById('adjusted-image-data');
+        const zoomLevel = document.getElementById('zoom-level');
+        const brightnessLevel = document.getElementById('brightness-level');
+        const contrastLevel = document.getElementById('contrast-level');
+
+        // Analysis elements
+        const analyzeProgress = document.getElementById('analyze-progress');
+        const statusSteps = document.querySelectorAll('.status-step');
+
+        // Variables
+        let selectedFile = null;
+        let adjustImage = null;
+
+        // Browse button click
+        if (browseBtn) {
+            browseBtn.addEventListener('click', function () {
+                fileInput.click();
+            });
+        }
+
+        // File input change
+        if (fileInput) {
+            fileInput.addEventListener('change', function (e) {
+                handleFileSelect(e.target.files[0]);
+            });
+        }
+
+        // Drag and drop functionality
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function () {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function (e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+
+                if (e.dataTransfer.files.length) {
+                    handleFileSelect(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
+        // Remove button click
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function () {
+                resetUpload();
+            });
+        }
+
+        // Continue button click
+        if (continueBtn) {
+            continueBtn.addEventListener('click', function () {
+                goToStep(2);
+                setupAdjustStep();
+            });
+        }
+
+        // Back to upload button click
+        if (backToUploadBtn) {
+            backToUploadBtn.addEventListener('click', function () {
+                goToStep(1);
+            });
+        }
+
+        // Proceed to analyze button click
+        if (proceedToAnalyzeBtn) {
+            proceedToAnalyzeBtn.addEventListener('click', function () {
+                saveAdjustedImage();
+                goToStep(3);
+                simulateAnalysis();
+            });
+        }
+
+        // Zoom controls
+        if (zoomSlider) {
+            zoomSlider.addEventListener('input', function () {
+                updateZoom(this.value);
+            });
+        }
+
+        if (zoomInBtn) {
+            zoomInBtn.addEventListener('click', function () {
+                const newValue = Math.min(parseInt(zoomSlider.value) + 10, 200);
+                zoomSlider.value = newValue;
+                updateZoom(newValue);
+            });
+        }
+
+        if (zoomOutBtn) {
+            zoomOutBtn.addEventListener('click', function () {
+                const newValue = Math.max(parseInt(zoomSlider.value) - 10, 100);
+                zoomSlider.value = newValue;
+                updateZoom(newValue);
+            });
+        }
+
+        // Brightness controls
+        if (brightnessSlider) {
+            brightnessSlider.addEventListener('input', function () {
+                updateBrightness(this.value);
+            });
+        }
+
+        if (brightnessUpBtn) {
+            brightnessUpBtn.addEventListener('click', function () {
+                const newValue = Math.min(parseInt(brightnessSlider.value) + 10, 150);
+                brightnessSlider.value = newValue;
+                updateBrightness(newValue);
+            });
+        }
+
+        if (brightnessDownBtn) {
+            brightnessDownBtn.addEventListener('click', function () {
+                const newValue = Math.max(parseInt(brightnessSlider.value) - 10, 50);
+                brightnessSlider.value = newValue;
+                updateBrightness(newValue);
+            });
+        }
+
+        // Contrast controls
+        if (contrastSlider) {
+            contrastSlider.addEventListener('input', function () {
+                updateContrast(this.value);
+            });
+        }
+
+        if (contrastUpBtn) {
+            contrastUpBtn.addEventListener('click', function () {
+                const newValue = Math.min(parseInt(contrastSlider.value) + 10, 150);
+                contrastSlider.value = newValue;
+                updateContrast(newValue);
+            });
+        }
+
+        if (contrastDownBtn) {
+            contrastDownBtn.addEventListener('click', function () {
+                const newValue = Math.max(parseInt(contrastSlider.value) - 10, 50);
+                contrastSlider.value = newValue;
+                updateContrast(newValue);
+            });
+        }
+
+        // Functions
+        function handleFileSelect(file) {
+            // Check file type
+            const validTypes = ['image/jpeg', 'image/png', 'image/heic'];
+            if (!validTypes.includes(file.type)) {
+                showError('Please select a valid image file (JPG, PNG, or HEIC)');
+                return;
+            }
+
+            // Check file size (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                showError('File size exceeds 10MB limit');
+                return;
+            }
+
+            selectedFile = file;
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+                uploadPlaceholder.style.display = 'none';
+                uploadPreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetUpload() {
+            fileInput.value = '';
+            selectedFile = null;
+            previewImage.src = '';
+            uploadPlaceholder.style.display = 'flex';
+            uploadPreview.style.display = 'none';
+        }
+
+        function goToStep(stepNumber) {
+            // Update step indicators
+            steps.forEach(step => {
+                if (parseInt(step.dataset.step) < stepNumber) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (parseInt(step.dataset.step) === stepNumber) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+
+            // Show appropriate step content
+            uploadStep.style.display = stepNumber === 1 ? 'block' : 'none';
+            adjustStep.style.display = stepNumber === 2 ? 'block' : 'none';
+            analyzeStep.style.display = stepNumber === 3 ? 'block' : 'none';
+        }
+
+        function setupAdjustStep() {
+            // Create image for adjustment
+            adjustImageContainer.innerHTML = '';
+            adjustImage = document.createElement('img');
+            adjustImage.src = previewImage.src;
+            adjustImage.id = 'adjust-image';
+            adjustImage.style.transform = 'scale(1)';
+            adjustImage.style.filter = 'brightness(100%) contrast(100%)';
+            adjustImageContainer.appendChild(adjustImage);
+
+            // Reset sliders
+            zoomSlider.value = 100;
+            brightnessSlider.value = 100;
+            contrastSlider.value = 100;
+
+            // Reset hidden fields
+            zoomLevel.value = 100;
+            brightnessLevel.value = 100;
+            contrastLevel.value = 100;
+        }
+
+        function updateZoom(value) {
+            if (adjustImage) {
+                const scale = value / 100;
+                adjustImage.style.transform = `scale(${scale})`;
+                zoomLevel.value = value;
+            }
+        }
+
+        function updateBrightness(value) {
+            if (adjustImage) {
+                const contrastValue = contrastSlider.value;
+                adjustImage.style.filter = `brightness(${value}%) contrast(${contrastValue}%)`;
+                brightnessLevel.value = value;
+            }
+        }
+
+        function updateContrast(value) {
+            if (adjustImage) {
+                const brightnessValue = brightnessSlider.value;
+                adjustImage.style.filter = `brightness(${brightnessValue}%) contrast(${value}%)`;
+                contrastLevel.value = value;
+            }
+        }
+
+        function saveAdjustedImage() {
+            // In a real implementation, you would capture the adjusted image data
+            // For this example, we'll just use the original image
+            adjustedImageData.value = previewImage.src;
+        }
+
+        function simulateAnalysis() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                analyzeProgress.style.width = `${progress}%`;
+
+                if (progress === 40) {
+                    // Update status steps
+                    statusSteps[1].classList.remove('active');
+                    statusSteps[1].classList.add('completed');
+                    statusSteps[2].classList.add('active');
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    // In a real implementation, you would submit the form here
+                    // For this example, we'll redirect to a results page after a delay
+                    setTimeout(() => {
+                        // Uncomment this in a real implementation
+                        uploadForm.submit();
+
+                    }, 1000);
+                }
+            }, 100);
+        }
+
+        function showError(message) {
+            // Create and show error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+
+            uploadArea.appendChild(errorDiv);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 3000);
+        }
+    });
+</script>
+{% endblock %}

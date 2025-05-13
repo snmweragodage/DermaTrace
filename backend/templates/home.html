@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Home | DermaTRACE{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <div class="welcome-text">
+            <h1>Welcome to <span class="brand-highlight"> DermaTRACE </span></h1>
+            <p class="greeting">Hello, <span class="username">{{ username }}</span>!</p>
+        </div>
+        <div class="welcome-image">
+            <img src="{{ url_for('static', filename='images/skin-health.svg') }}" alt="Skin Health Illustration">
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-number">10+</div>
+            <div class="stat-label">Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-image"></i></div>
+            <div class="stat-number">100+</div>
+            <div class="stat-label">Images Analyzed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-number">80%</div>
+            <div class="stat-label">Accuracy</div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="how-it-works">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-icon"><i class="fas fa-camera"></i></div>
+                <h3>Take a Photo</h3>
+                <p>Upload a clear image of the skin lesion you're concerned about.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-icon"><i class="fas fa-robot"></i></div>
+                <h3>AI Analysis</h3>
+                <p>Our advanced AI analyzes the image for potential risk factors.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-icon"><i class="fas fa-chart-bar"></i></div>
+                <h3>Get Results</h3>
+                <p>Receive a detailed risk assessment and recommended next steps.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="info-cards">
+        <div class="info-card">
+            <div class="card-icon"><i class="fas fa-info-circle"></i></div>
+            <h2>About This App</h2>
+            <p>This app helps analyze skin lesions for potential cancer risk. Not a diagnosis, just AI guidance.</p>
+        </div>
+        <div class="info-card">
+            <div class="card-icon"><i class="fas fa-heartbeat"></i></div>
+            <h2>About Skin Cancer</h2>
+            <p>Skin cancer is common. Early detection saves lives.</p>
+            <ul class="resource-links">
+                <li><a href="https://www.cancerresearchuk.org/about-cancer/skin-cancer" target="_blank"><i
+                            class="fas fa-external-link-alt"></i> What is skin cancer?</a></li>
+                <li><a href="https://www.youtube.com/watch?v=bzxYALEhc3U" target="_blank"><i class="fab fa-youtube"></i>
+                        Skin Cancer Explained</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="testimonials">
+        <h2 class="section-title">What Users Say</h2>
+        <div class="testimonial-slider">
+            <div class="testimonial">
+                <div class="testimonial-content">
+                    <p>"DermaTRACE helped me identify a suspicious mole that turned out to be melanoma. Early detection
+                        saved my life."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="testimonial-info">
+                        <p>User since 2025</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial">
+                <div class="testimonial-content">
+                    <p>"As a dermatologist, I recommend DermaTRACE to my patients for monitoring changes in their skin
+                        between appointments."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="testimonial-info">
+                        <p>Dermatologist</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="testimonial-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="/upload" class="action-btn upload-btn"><i class="fas fa-upload"></i><span>Upload</span></a>
+        <a href="/history" class="action-btn history-btn"><i class="fas fa-history"></i><span>My History</span></a>
+        <a href="/profile" class="action-btn profile-btn"><i class="fas fa-user"></i><span>My Profile</span></a>
+        <a href="/logout" class="action-btn logout-btn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="floating-action-button">
+        <a href="/upload" title="Quick Upload">
+            <i class="fas fa-camera"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

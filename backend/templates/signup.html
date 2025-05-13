@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up | DermaTRACE{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="signup-page-container">
+    <div class="signup-card">
+        <div class="signup-image-side">
+            <div class="signup-overlay">
+                <div class="brand-content">
+                    <div class="logo-large">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <h2>DermaTRACE</h2>
+                    <p>Join thousands of users monitoring their skin health with AI-powered analysis</p>
+
+                    <div class="benefits">
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Early detection of potential issues</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Track changes over time</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Secure and private analysis</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="signup-form-side">
+            <div class="signup-header">
+                <h1>Create Your Account</h1>
+                <p>Fill in your details to get started</p>
+
+                <div class="form-progress">
+                    <div class="progress-step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Account</div>
+                    </div>
+                    <div class="progress-connector"></div>
+                    <div class="progress-step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Personal</div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="/signup" class="signup-form" id="signup-form">
+                <!-- Step 1: Account Information -->
+                <div class="form-step" id="step-1">
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i>
+                            <span>Username</span>
+                        </label>
+                        <input type="text" id="username" name="username" required autocomplete="username">
+                        <div class="field-hint">Choose a unique username</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i>
+                            <span>Email</span>
+                        </label>
+                        <input type="email" id="email" name="email" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i>
+                            <span>Password</span>
+                        </label>
+                        <input type="password" id="password" name="password" required autocomplete="new-password">
+                        <button type="button" class="password-toggle" id="password-toggle"
+                            aria-label="Toggle password visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="password-strength">
+                            <div class="strength-meter">
+                                <div class="strength-meter-fill" id="strength-meter-fill"></div>
+                            </div>
+                            <div class="strength-text" id="strength-text">Password strength</div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="next-btn" id="to-step-2">
+                            <span>Next</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Personal Information -->
+                <div class="form-step hidden" id="step-2">
+                    <div class="form-group">
+                        <label for="phone">
+                            <i class="fas fa-phone"></i>
+                            <span>Phone</span>
+                        </label>
+                        <input type="tel" id="phone" name="phone" required autocomplete="tel">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="gender">
+                                <i class="fas fa-venus-mars"></i>
+                                <span>Gender</span>
+                            </label>
+                            <select id="gender" name="gender" required>
+                                <option value="">Select</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                                <option value="Prefer not to say">Prefer not to say</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group half">
+                            <label for="age">
+                                <i class="fas fa-birthday-cake"></i>
+                                <span>Age</span>
+                            </label>
+                            <input type="number" id="age" name="age" min="1" max="120" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dob">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Date of Birth</span>
+                        </label>
+                        <input type="date" id="dob" name="dob" required>
+                    </div>
+
+                    <div class="form-group terms-group">
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <label for="terms">I agree to the <a href="/terms" target="_blank">Terms of Service</a> and
+                                <a href="/privacy" target="_blank">Privacy Policy</a></label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="back-btn" id="to-step-1">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Back</span>
+                        </button>
+                        <button type="submit" class="create-btn">
+                            <span>Create Account</span>
+                            <i class="fas fa-user-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="signup-footer">
+                <p>Already have an account? <a href="/" class="login-link">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Multi-step form navigation
+        const toStep2Btn = document.getElementById('to-step-2');
+        const toStep1Btn = document.getElementById('to-step-1');
+        const step1 = document.getElementById('step-1');
+        const step2 = document.getElementById('step-2');
+        const progressSteps = document.querySelectorAll('.progress-step');
+
+        if (toStep2Btn && step2) {
+            toStep2Btn.addEventListener('click', function () {
+                // Validate step 1 fields
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                if (!username || !email || !password) {
+                    // Show error for empty fields
+                    if (!username) highlightError('username');
+                    if (!email) highlightError('email');
+                    if (!password) highlightError('password');
+                    return;
+                }
+
+                // Move to step 2
+                step1.classList.add('hidden');
+                step2.classList.remove('hidden');
+
+                // Update progress indicator
+                progressSteps.forEach(step => {
+                    if (step.dataset.step === '2') {
+                        step.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        if (toStep1Btn && step1) {
+            toStep1Btn.addEventListener('click', function () {
+                step2.classList.add('hidden');
+                step1.classList.remove('hidden');
+
+                // Update progress indicator
+                progressSteps.forEach(step => {
+                    if (step.dataset.step === '2') {
+                        step.classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        // Password visibility toggle
+        const passwordToggle = document.getElementById('password-toggle');
+        const passwordInput = document.getElementById('password');
+
+        if (passwordToggle && passwordInput) {
+            passwordToggle.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                // Toggle icon
+                const icon = this.querySelector('i');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        // Password strength meter
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function () {
+                const password = this.value;
+                const strengthMeter = document.getElementById('strength-meter-fill');
+                const strengthText = document.getElementById('strength-text');
+
+                if (!password) {
+                    strengthMeter.style.width = '0%';
+                    strengthMeter.className = 'strength-meter-fill';
+                    strengthText.textContent = 'Password strength';
+                    return;
+                }
+
+                // Calculate password strength
+                let strength = 0;
+
+                // Length check
+                if (password.length >= 8) strength += 25;
+
+                // Character variety checks
+                if (/[A-Z]/.test(password)) strength += 25; // Uppercase
+                if (/[a-z]/.test(password)) strength += 25; // Lowercase
+                if (/[0-9]/.test(password)) strength += 12.5; // Numbers
+                if (/[^A-Za-z0-9]/.test(password)) strength += 12.5; // Special chars
+
+                // Update UI
+                strengthMeter.style.width = `${strength}%`;
+
+                // Set color and text based on strength
+                if (strength < 40) {
+                    strengthMeter.className = 'strength-meter-fill weak';
+                    strengthText.textContent = 'Weak password';
+                } else if (strength < 70) {
+                    strengthMeter.className = 'strength-meter-fill medium';
+                    strengthText.textContent = 'Medium strength';
+                } else {
+                    strengthMeter.className = 'strength-meter-fill strong';
+                    strengthText.textContent = 'Strong password';
+                }
+            });
+        }
+
+        // Form animation
+        const formGroups = document.querySelectorAll('.form-group');
+        formGroups.forEach((group, index) => {
+            setTimeout(() => {
+                group.classList.add('form-group-animate');
+            }, 100 * (index + 1));
+        });
+
+        // Helper function to highlight errors
+        function highlightError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const formGroup = field.closest('.form-group');
+
+            formGroup.classList.add('error');
+
+            field.addEventListener('input', function () {
+                if (this.value) {
+                    formGroup.classList.remove('error');
+                }
+            });
+        }
+
+        // Auto-calculate age from DOB
+        const dobInput = document.getElementById('dob');
+        const ageInput = document.getElementById('age');
+
+        if (dobInput && ageInput) {
+            dobInput.addEventListener('change', function () {
+                const dob = new Date(this.value);
+                const today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+
+                // Adjust age if birthday hasn't occurred yet this year
+                const monthDiff = today.getMonth() - dob.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
+
+                if (age >= 0) {
+                    ageInput.value = age;
+                }
+            });
+
+            ageInput.addEventListener('change', function () {
+                // If user manually changes age, clear DOB to avoid conflicts
+                if (dobInput.value && this.value) {
+                    const calculatedAge = calculateAgeFromDob(dobInput.value);
+                    if (parseInt(this.value) !== calculatedAge) {
+                        dobInput.value = '';
+                    }
+                }
+            });
+        }
+
+        function calculateAgeFromDob(dobString) {
+            const dob = new Date(dobString);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+
+            const monthDiff = today.getMonth() - dob.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            return age;
+        }
+    });
+</script>
+{% endblock %}

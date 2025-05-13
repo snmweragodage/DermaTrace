@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results | DermaTRACE{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="results-page-container">
+    <div class="results-card">
+        <div class="results-header">
+            <h1>
+                <i class="fas fa-chart-pie"></i>
+                Analysis Results
+            </h1>
+            <p class="timestamp">Analyzed on {{ analysis_date|default('today', true) }}</p>
+        </div>
+
+        <div class="results-content">
+            <div class="results-overview">
+                <div class="image-container">
+                    <div class="image-wrapper">
+                        <img src="/{{ img_path }}" alt="Uploaded Skin Lesion" class="result-image">
+                        <div class="image-overlay">
+                            <button class="zoom-btn" id="zoom-image">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="image-caption">Uploaded Image</div>
+                </div>
+
+                <div class="diagnosis-summary">
+                    <div class="diagnosis-result {{ result|lower }}">
+                        <div class="result-icon">
+                            {% if result == 'Cancerous' %}
+                            <i class="fas fa-exclamation-triangle"></i>
+                            {% else %}
+                            <i class="fas fa-check-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="result-text">
+                            <h2>{{ result }}</h2>
+                            <p>{{ cancer_type }}</p>
+                        </div>
+                    </div>
+
+                    <div class="confidence-meter">
+                        <div class="meter-label">
+                            <span>Confidence Score</span>
+                            <span class="confidence-value">{{ percentage }}</span>
+                        </div>
+                        <div class="meter-bar">
+                            <div class="meter-fill {{ result|lower }}"
+                                style="width: {{ percentage|replace('%', '') }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="risk-indicator">
+                        <div class="risk-label">Risk Level</div>
+                        <div class="risk-levels">
+                            <div class="risk-level {% if risk == 'Low' %}active{% endif %}" data-level="Low">
+                                <div class="level-marker"></div>
+                                <span>Low</span>
+                            </div>
+                            <div class="risk-level {% if risk == 'Medium' %}active{% endif %}" data-level="Medium">
+                                <div class="level-marker"></div>
+                                <span>Medium</span>
+                            </div>
+                            <div class="risk-level {% if risk == 'High' %}active{% endif %}" data-level="High">
+                                <div class="level-marker"></div>
+                                <span>High</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recommendation-section {{ result|lower }}">
+                <div class="recommendation-icon">
+                    {% if result == 'Cancerous' %}
+                    <i class="fas fa-user-md"></i>
+                    {% else %}
+                    <i class="fas fa-heart"></i>
+                    {% endif %}
+                </div>
+                <div class="recommendation-content">
+                    <h3>Recommendation</h3>
+                    {% if result == 'Cancerous' %}
+                    <p>This image shows characteristics consistent with a potentially cancerous lesion. Please consult a
+                        dermatologist or medical professional as soon as possible.</p>
+                    <div class="action-steps">
+                        <div class="action-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Schedule an appointment with a dermatologist</div>
+                        </div>
+                        <div class="action-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Share these results with your healthcare provider</div>
+                        </div>
+                        <div class="action-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Continue monitoring for any changes</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p>This lesion does not appear to show characteristics of skin cancer. However, regular monitoring
+                        is still recommended.</p>
+                    <div class="action-steps">
+                        <div class="action-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Continue regular skin self-examinations</div>
+                        </div>
+                        <div class="action-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Take follow-up photos every 3 months</div>
+                        </div>
+                        <div class="action-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Consult a doctor if you notice any changes</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="additional-info">
+                <div class="info-tabs">
+                    <button class="tab-btn active" data-tab="characteristics">Characteristics</button>
+                    <button class="tab-btn" data-tab="resources">Resources</button>
+                    <button class="tab-btn" data-tab="next-steps">Next Steps</button>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="characteristics-tab">
+                        <h4>Identified Characteristics</h4>
+                        <ul class="characteristics-list">
+                            <li>
+                                <span class="characteristic-name">Asymmetry:</span>
+                                <span class="characteristic-value">{{ asymmetry|default('Moderate', true) }}</span>
+                            </li>
+                            <li>
+                                <span class="characteristic-name">Border:</span>
+                                <span class="characteristic-value">{{ border|default('Irregular', true) }}</span>
+                            </li>
+                            <li>
+                                <span class="characteristic-name">Color:</span>
+                                <span class="characteristic-value">{{ color|default('Varied', true) }}</span>
+                            </li>
+                            <li>
+                                <span class="characteristic-name">Diameter:</span>
+                                <span class="characteristic-value">{{ diameter|default('5mm', true) }}</span>
+                            </li>
+                            <li>
+                                <span class="characteristic-name">Evolution:</span>
+                                <span class="characteristic-value">{{ evolution|default('Unknown', true) }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-pane" id="resources-tab">
+                        <h4>Helpful Resources</h4>
+                        <div class="resources-list">
+                            <a href="https://www.cancer.org/cancer/skin-cancer.html" class="resource-link"
+                                target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div class="resource-info">
+                                    <span class="resource-title">American Cancer Society</span>
+                                    <span class="resource-desc">Information about skin cancer types, causes, and
+                                        treatments</span>
+                                </div>
+                            </a>
+                            <a href="https://www.aad.org/public/diseases/skin-cancer" class="resource-link"
+                                target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div class="resource-info">
+                                    <span class="resource-title">American Academy of Dermatology</span>
+                                    <span class="resource-desc">Expert advice on skin cancer prevention and
+                                        detection</span>
+                                </div>
+                            </a>
+                            <a href="https://www.skincancer.org/early-detection/self-exams/" class="resource-link"
+                                target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div class="resource-info">
+                                    <span class="resource-title">Skin Cancer Foundation</span>
+                                    <span class="resource-desc">Guide to performing skin self-examinations</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="next-steps-tab">
+                        <h4>Recommended Next Steps</h4>
+                        <div class="next-steps-content">
+                            <p>Based on your analysis results, here are the recommended next steps:</p>
+                            <ol class="steps-list">
+                                {% if result == 'Cancerous' %}
+                                <li>Save or print this analysis to share with your healthcare provider</li>
+                                <li>Contact a dermatologist within the next 1-2 weeks</li>
+                                <li>Continue to monitor the lesion for any changes</li>
+                                <li>Schedule regular skin check-ups</li>
+                                {% else %}
+                                <li>Save this analysis for your records</li>
+                                <li>Set a reminder to check this spot again in 3 months</li>
+                                <li>Use the ABCDE method to monitor for changes</li>
+                                <li>Consider an annual skin check with a dermatologist</li>
+                                {% endif %}
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-footer">
+            <div class="disclaimer">
+                <i class="fas fa-info-circle"></i>
+                <p>This analysis is for educational purposes only and is not a substitute for professional medical
+                    advice.</p>
+            </div>
+            <div class="action-buttons">
+                <a href="/home" class="action-btn secondary-btn">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/upload" class="action-btn primary-btn">
+                    <i class="fas fa-upload"></i>
+                    <span>Analyze Another</span>
+                </a>
+                <a href="/history" class="action-btn secondary-btn">
+                    <i class="fas fa-history"></i>
+                    <span>History</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="image-modal" id="image-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <img src="/{{ img_path }}" alt="Enlarged Skin Lesion" id="modal-image">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tab functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and panes
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                // Add active class to clicked button
+                button.classList.add('active');
+
+                // Show corresponding tab pane
+                const tabId = button.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Image modal functionality
+        const modal = document.getElementById('image-modal');
+        const zoomBtn = document.getElementById('zoom-image');
+        const closeModal = document.getElementById('close-modal');
+        const modalImage = document.getElementById('modal-image');
+        const resultImage = document.querySelector('.result-image');
+
+        zoomBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        });
+
+        // Close modal when clicking outside the image
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Add animation to elements
+        const animateElements = document.querySelectorAll('.diagnosis-result, .confidence-meter, .risk-indicator, .recommendation-section');
+
+        animateElements.forEach((element, index) => {
+            setTimeout(() => {
+                element.classList.add('animate-in');
+            }, 100 * index);
+        });
+    });
+</script>
+{% endblock %}

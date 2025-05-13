@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile | DermaTRACE{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page-container">
+    <div class="profile-header">
+        <div class="header-content">
+            <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+            <p class="subtitle">Manage your personal information and preferences</p>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-sidebar">
+            <div class="profile-avatar">
+                <div class="avatar-image">
+                    {% if user.profile_image %}
+                    <img src="{{ url_for('static', filename='uploads/profiles/' + user.profile_image) }}"
+                        alt="Profile Picture">
+                    {% else %}
+                    <div class="avatar-placeholder">
+                        <span>{{ user.username[0]|upper }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="avatar-info">
+                    <h2 class="user-name">{{ user.username }}</h2>
+
+                </div>
+
+            </div>
+
+            <div class="profile-nav">
+                <a href="#personal-info" class="nav-item active">
+                    <i class="fas fa-id-card"></i>
+                    <span>Personal Information</span>
+                </a>
+
+            </div>
+        </div>
+
+        <div class="profile-main">
+            <div id="personal-info" class="profile-section active">
+                <div class="section-header">
+                    <h2>Personal Information</h2>
+
+                </div>
+
+                <div class="info-card">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user"></i>
+                                <span>Username</span>
+                            </div>
+                            <div class="info-value">{{ user.username }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-envelope"></i>
+                                <span>Email</span>
+                            </div>
+                            <div class="info-value">{{ user.email }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-phone"></i>
+                                <span>Phone</span>
+                            </div>
+                            <div class="info-value">{{ user.phone if user.phone else 'Not provided' }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-venus-mars"></i>
+                                <span>Gender</span>
+                            </div>
+                            <div class="info-value">{{ user.gender if user.gender else 'Not provided' }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-birthday-cake"></i>
+                                <span>Date of Birth</span>
+                            </div>
+                            <div class="info-value">{{ user.dob if user.dob else 'Not provided' }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-hourglass-half"></i>
+                                <span>Age</span>
+                            </div>
+                            <div class="info-value">{{ user.age if user.age else 'Not provided' }}</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="profile-footer">
+                    <a href="/home" class="secondary-btn">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                    <a href="/logout" class="danger-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <!-- Edit Profile Modal -->
+            <div class="modal" id="edit-profile-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Edit Personal Information</h2>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-profile-form" action="/update-profile" method="post">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" name="username" value="{{ user.username }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="tel" id="phone" name="phone" value="{{ user.phone }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <select id="gender" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male" {% if user.gender=='Male' %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if user.gender=='Female' %}selected{% endif %}>Female
+                                    </option>
+                                    <option value="Other" {% if user.gender=='Other' %}selected{% endif %}>Other
+                                    </option>
+                                    <option value="Prefer not to say" {% if user.gender=='Prefer not to say'
+                                        %}selected{% endif %}>
+                                        Prefer not to say</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="dob">Date of Birth</label>
+                                <input type="date" id="dob" name="dob" value="{{ user.dob }}">
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="cancel-btn" id="cancel-edit">Cancel</button>
+                                <button type="submit" class="save-btn">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Medical Info Modal -->
+            <div class="modal" id="edit-medical-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Edit Medical Information</h2>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-medical-form" action="/update-medical-info" method="post">
+                            <div class="form-group">
+                                <label for="skin_type">Skin Type</label>
+                                <select id="skin_type" name="skin_type">
+                                    <option value="">Select Skin Type</option>
+                                    <option value="Type I" {% if user.skin_type=='Type I' %}selected{% endif %}>Type I -
+                                        Very
+                                        fair,
+                                        always burns</option>
+                                    <option value="Type II" {% if user.skin_type=='Type II' %}selected{% endif %}>Type
+                                        II -
+                                        Fair,
+                                        burns easily</option>
+                                    <option value="Type III" {% if user.skin_type=='Type III' %}selected{% endif %}>Type
+                                        III -
+                                        Medium, sometimes burns</option>
+                                    <option value="Type IV" {% if user.skin_type=='Type IV' %}selected{% endif %}>Type
+                                        IV -
+                                        Olive,
+                                        rarely burns</option>
+                                    <option value="Type V" {% if user.skin_type=='Type V' %}selected{% endif %}>Type V -
+                                        Brown,
+                                        very
+                                        rarely burns</option>
+                                    <option value="Type VI" {% if user.skin_type=='Type VI' %}selected{% endif %}>Type
+                                        VI - Dark
+                                        brown/black, never burns</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="family_history">Family History of Skin Cancer</label>
+                                <select id="family_history" name="family_history">
+                                    <option value="">Select Option</option>
+                                    <option value="Yes" {% if user.family_history=='Yes' %}selected{% endif %}>Yes
+                                    </option>
+                                    <option value="No" {% if user.family_history=='No' %}selected{% endif %}>No</option>
+                                    <option value="Unknown" {% if user.family_history=='Unknown' %}selected{% endif %}>
+                                        Unknown
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sun_exposure">Typical Sun Exposure</label>
+                                <select id="sun_exposure" name="sun_exposure">
+                                    <option value="">Select Option</option>
+                                    <option value="Low" {% if user.sun_exposure=='Low' %}selected{% endif %}>Low (Indoor
+                                        work,
+                                        minimal outdoor activities)</option>
+                                    <option value="Moderate" {% if user.sun_exposure=='Moderate' %}selected{% endif %}>
+                                        Moderate
+                                        (Some outdoor activities)</option>
+                                    <option value="High" {% if user.sun_exposure=='High' %}selected{% endif %}>High
+                                        (Outdoor
+                                        work or
+                                        frequent outdoor activities)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="previous_conditions">Previous Skin Conditions</label>
+                                <textarea id="previous_conditions" name="previous_conditions"
+                                    rows="3">{{ user.previous_conditions }}</textarea>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="cancel-btn" id="cancel-medical-edit">Cancel</button>
+                                <button type="submit" class="save-btn">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+
+            {% block scripts %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Navigation
+                    const navItems = document.querySelectorAll('.nav-item');
+                    const sections = document.querySelectorAll('.profile-section');
+
+                    navItems.forEach(item => {
+                        item.addEventListener('click', function (e) {
+                            e.preventDefault();
+
+                            // Remove active class from all nav items and sections
+                            navItems.forEach(nav => nav.classList.remove('active'));
+                            sections.forEach(section => section.classList.remove('active'));
+
+                            // Add active class to clicked nav item
+                            this.classList.add('active');
+
+                            // Show corresponding section
+                            const targetId = this.getAttribute('href').substring(1);
+                            document.getElementById(targetId).classList.add('active');
+                        });
+                    });
+
+                    // Edit Personal Info Modal
+                    const editPersonalBtn = document.getElementById('edit-personal-info');
+                    const editProfileModal = document.getElementById('edit-profile-modal');
+                    const cancelEditBtn = document.getElementById('cancel-edit');
+                    const closeModalBtns = document.querySelectorAll('.close-modal');
+
+                    if (editPersonalBtn) {
+                        editPersonalBtn.addEventListener('click', function () {
+                            editProfileModal.style.display = 'flex';
+                        });
+                    }
+
+                    if (cancelEditBtn) {
+                        cancelEditBtn.addEventListener('click', function () {
+                            editProfileModal.style.display = 'none';
+                        });
+                    }
+
+                    // Edit Medical Info Modal
+                    const editMedicalBtn = document.getElementById('edit-medical-info');
+                    const editMedicalModal = document.getElementById('edit-medical-modal');
+                    const cancelMedicalBtn = document.getElementById('cancel-medical-edit');
+
+                    if (editMedicalBtn) {
+                        editMedicalBtn.addEventListener('click', function () {
+                            editMedicalModal.style.display = 'flex';
+                        });
+                    }
+
+                    if (cancelMedicalBtn) {
+                        cancelMedicalBtn.addEventListener('click', function () {
+                            editMedicalModal.style.display = 'none';
+                        });
+                    }
+
+                    // Close modals
+                    closeModalBtns.forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const modal = this.closest('.modal');
+                            if (modal) {
+                                modal.style.display = 'none';
+                            }
+                        });
+                    });
+
+                    // Close modal when clicking outside
+                    window.addEventListener('click', function (e) {
+                        if (e.target.classList.contains('modal')) {
+                            e.target.style.display = 'none';
+                        }
+                    });
+
+                    // Edit Avatar (placeholder)
+                    const editAvatarBtn = document.querySelector('.edit-avatar-btn');
+                    if (editAvatarBtn) {
+                        editAvatarBtn.addEventListener('click', function () {
+                            alert('Profile photo upload functionality would be implemented here.');
+                        });
+                    }
+                });
+            </script>
+            {% endblock %}
